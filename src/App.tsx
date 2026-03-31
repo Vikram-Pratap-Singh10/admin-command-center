@@ -6,49 +6,55 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PermissionsProvider } from "@/contexts/PermissionsContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Users from "@/pages/Users";
 import Products from "@/pages/Products";
 import Orders from "@/pages/Orders";
+import VisualAids from "@/pages/VisualAids";
+import FAQs from "@/pages/FAQs";
+import Notifications from "@/pages/Notifications";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <PermissionsProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/users" element={<Users />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/visual-aids" element={<PlaceholderPage title="Visual Aids" />} />
-                <Route path="/faqs" element={<PlaceholderPage title="FAQs" />} />
-                <Route path="/notifications" element={<PlaceholderPage title="Notifications" />} />
-                <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </PermissionsProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <PermissionsProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route path="/" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
+                  <Route path="/users" element={<ErrorBoundary><Users /></ErrorBoundary>} />
+                  <Route path="/products" element={<ErrorBoundary><Products /></ErrorBoundary>} />
+                  <Route path="/orders" element={<ErrorBoundary><Orders /></ErrorBoundary>} />
+                  <Route path="/visual-aids" element={<ErrorBoundary><VisualAids /></ErrorBoundary>} />
+                  <Route path="/faqs" element={<ErrorBoundary><FAQs /></ErrorBoundary>} />
+                  <Route path="/notifications" element={<ErrorBoundary><Notifications /></ErrorBoundary>} />
+                  <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </PermissionsProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 function PlaceholderPage({ title }: { title: string }) {
