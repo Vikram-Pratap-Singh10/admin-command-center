@@ -10,6 +10,8 @@ import { DashboardLayout } from "@/layouts/DashboardLayout";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Users from "@/pages/Users";
+import Products from "@/pages/Products";
+import Orders from "@/pages/Orders";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,8 +35,8 @@ const App = () => (
               >
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/users" element={<Users />} />
-                <Route path="/products" element={<PlaceholderPage title="Products" />} />
-                <Route path="/orders" element={<PlaceholderPage title="Orders" />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/orders" element={<Orders />} />
                 <Route path="/visual-aids" element={<PlaceholderPage title="Visual Aids" />} />
                 <Route path="/faqs" element={<PlaceholderPage title="FAQs" />} />
                 <Route path="/notifications" element={<PlaceholderPage title="Notifications" />} />
