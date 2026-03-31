@@ -73,12 +73,20 @@ export function ProductFormModal({ open, product, onClose, onSave }: Props) {
   }, []);
 
   const onSubmit = (values: FormValues) => {
-    onSave({
+    const p: Product = {
       id: product?.id ?? "",
-      ...values,
+      name: values.name,
+      division: values.division,
+      description: values.description,
+      mrp: values.mrp,
+      actualPrice: values.actualPrice,
+      sku: values.sku,
+      stock: values.stock,
+      isActive: values.isActive,
       images,
       createdAt: product?.createdAt ?? new Date().toISOString(),
-    });
+    };
+    onSave(p);
   };
 
   return (
