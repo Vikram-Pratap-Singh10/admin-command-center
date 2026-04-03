@@ -24,7 +24,7 @@ const routeLabels: Record<string, string> = {
   "/settings": "Settings",
 };
 
-export function DashboardHeader() {
+export function DashboardHeader({ mobileDrawer }: { mobileDrawer?: React.ReactNode }) {
   const location = useLocation();
   const { user, logout } = useAuth();
 
@@ -40,7 +40,7 @@ export function DashboardHeader() {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-card px-4 shadow-sm">
       <div className="flex items-center gap-3">
-        <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
+        {mobileDrawer || <SidebarTrigger className="text-muted-foreground hover:text-foreground" />}
         <nav className="flex items-center gap-1.5 text-sm">
           <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
             Home
@@ -71,11 +71,11 @@ export function DashboardHeader() {
               <p className="text-xs text-muted-foreground">{user?.email}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" /> Profile
+            <DropdownMenuItem asChild>
+              <Link to="/settings"><User className="mr-2 h-4 w-4" /> Profile</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" /> Settings
+            <DropdownMenuItem asChild>
+              <Link to="/settings"><Settings className="mr-2 h-4 w-4" /> Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">

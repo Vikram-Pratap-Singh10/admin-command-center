@@ -16,6 +16,7 @@ import Orders from "@/pages/Orders";
 import VisualAids from "@/pages/VisualAids";
 import FAQs from "@/pages/FAQs";
 import Notifications from "@/pages/Notifications";
+import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,7 +46,7 @@ const App = () => (
                   <Route path="/visual-aids" element={<ErrorBoundary><VisualAids /></ErrorBoundary>} />
                   <Route path="/faqs" element={<ErrorBoundary><FAQs /></ErrorBoundary>} />
                   <Route path="/notifications" element={<ErrorBoundary><Notifications /></ErrorBoundary>} />
-                  <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+                  <Route path="/settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
@@ -56,14 +57,5 @@ const App = () => (
     </QueryClientProvider>
   </ErrorBoundary>
 );
-
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-      <p className="text-muted-foreground text-sm">This module will be built in upcoming phases.</p>
-    </div>
-  );
-}
 
 export default App;
