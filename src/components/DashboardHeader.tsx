@@ -24,7 +24,7 @@ const routeLabels: Record<string, string> = {
   "/settings": "Settings",
 };
 
-export function DashboardHeader() {
+export function DashboardHeader({ mobileDrawer }: { mobileDrawer?: React.ReactNode }) {
   const location = useLocation();
   const { user, logout } = useAuth();
 
