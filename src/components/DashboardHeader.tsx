@@ -40,7 +40,7 @@ export function DashboardHeader({ mobileDrawer }: { mobileDrawer?: React.ReactNo
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-card px-4 shadow-sm">
       <div className="flex items-center gap-3">
-        <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
+        {mobileDrawer || <SidebarTrigger className="text-muted-foreground hover:text-foreground" />}
         <nav className="flex items-center gap-1.5 text-sm">
           <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
             Home

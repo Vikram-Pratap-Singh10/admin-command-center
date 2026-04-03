@@ -46,7 +46,7 @@ const App = () => (
                   <Route path="/visual-aids" element={<ErrorBoundary><VisualAids /></ErrorBoundary>} />
                   <Route path="/faqs" element={<ErrorBoundary><FAQs /></ErrorBoundary>} />
                   <Route path="/notifications" element={<ErrorBoundary><Notifications /></ErrorBoundary>} />
-                  <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+                  <Route path="/settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
