@@ -58,13 +58,4 @@ const App = () => (
   </ErrorBoundary>
 );
 
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-      <p className="text-muted-foreground text-sm">This module will be built in upcoming phases.</p>
-    </div>
-  );
-}
-
 export default App;
