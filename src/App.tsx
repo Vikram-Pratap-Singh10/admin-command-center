@@ -16,6 +16,7 @@ import Orders from "@/pages/Orders";
 import VisualAids from "@/pages/VisualAids";
 import FAQs from "@/pages/FAQs";
 import Notifications from "@/pages/Notifications";
+import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
