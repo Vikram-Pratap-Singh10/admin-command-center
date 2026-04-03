@@ -71,11 +71,11 @@ export function DashboardHeader() {
               <p className="text-xs text-muted-foreground">{user?.email}</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" /> Profile
+            <DropdownMenuItem asChild>
+              <Link to="/settings"><User className="mr-2 h-4 w-4" /> Profile</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" /> Settings
+            <DropdownMenuItem asChild>
+              <Link to="/settings"><Settings className="mr-2 h-4 w-4" /> Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
