@@ -11,6 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { User, Lock, Bell, Palette, Shield } from "lucide-react";
+import { RolesPermissionsTab } from "@/components/settings/RolesPermissionsTab";
+import { PermissionGuard } from "@/components/PermissionGuard";
 
 export default function Settings() {
   const { user } = useAuth();
@@ -71,9 +73,10 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:w-auto lg:inline-grid">
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 lg:w-auto lg:inline-grid">
           <TabsTrigger value="profile" className="gap-2"><User className="h-4 w-4 hidden sm:block" /> Profile</TabsTrigger>
           <TabsTrigger value="security" className="gap-2"><Lock className="h-4 w-4 hidden sm:block" /> Security</TabsTrigger>
+          <TabsTrigger value="roles" className="gap-2"><Shield className="h-4 w-4 hidden sm:block" /> Roles</TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2"><Bell className="h-4 w-4 hidden sm:block" /> Notifications</TabsTrigger>
           <TabsTrigger value="app" className="gap-2"><Palette className="h-4 w-4 hidden sm:block" /> App Config</TabsTrigger>
         </TabsList>
