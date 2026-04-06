@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
+import { usePermissions } from "@/contexts/PermissionsContext";
+import { ModuleKey } from "@/data/roles-permissions";
 import {
   Sidebar,
   SidebarContent,
@@ -25,58 +27,77 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const mainNav = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Users", url: "/users", icon: Users },
-  { title: "Products", url: "/products", icon: Package },
-  { title: "Orders", url: "/orders", icon: ShoppingCart },
+interface NavItem {
+  title: string;
+  url: string;
+  icon: React.ElementType;
+  module: ModuleKey;
+}
+
+const mainNav: NavItem[] = [
+  { title: "Dashboard", url: "/", icon: LayoutDashboard, module: "dashboard" },
+  { title: "Users", url: "/users", icon: Users, module: "users" },
+  { title: "Products", url: "/products", icon: Package, module: "products" },
+  { title: "Orders", url: "/orders", icon: ShoppingCart, module: "orders" },
 ];
 
-const contentNav = [
-  { title: "Visual Aids", url: "/visual-aids", icon: Image },
-  { title: "FAQs", url: "/faqs", icon: HelpCircle },
-  { title: "Notifications", url: "/notifications", icon: Bell },
+const contentNav: NavItem[] = [
+  { title: "Visual Aids", url: "/visual-aids", icon: Image, module: "visual_aids" },
+  { title: "FAQs", url: "/faqs", icon: HelpCircle, module: "faqs" },
+  { title: "Notifications", url: "/notifications", icon: Bell, module: "notifications" },
 ];
 
-const systemNav = [
-  { title: "Settings", url: "/settings", icon: Settings },
+const systemNav: NavItem[] = [
+  { title: "Settings", url: "/settings", icon: Settings, module: "settings" },
 ];
 
 export function AppSidebar() {
   const { state, isMobile, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  const isActive = (path: string) => location.pathname === path;
+  const { canViewModule } = usePermissions();
 
   const handleNavClick = () => {
     if (isMobile) setOpenMobile(false);
   };
 
-  const renderGroup = (label: string, items: typeof mainNav) => (
-    <SidebarGroup>
-      {!collapsed && <SidebarGroupLabel className="text-sidebar-muted text-xs font-semibold uppercase tracking-wider">{label}</SidebarGroupLabel>}
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild>
-                <NavLink
-                  to={item.url}
-                  end={item.url === "/"}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                  activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
-                  onClick={handleNavClick}
-                >
-                  <item.icon className="h-4 w-4 shrink-0" />
-                  {!collapsed && <span>{item.title}</span>}
-                </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  );
+  const filterByPermission = (items: NavItem[]) =>
+    items.filter((item) => canViewModule(item.module));
+
+  const renderGroup = (label: string, items: NavItem[]) => {
+    const visible = filterByPermission(items);
+    if (visible.length === 0) return null;
+
+    return (
+      <SidebarGroup>
+        {!collapsed && (
+          <SidebarGroupLabel className="text-sidebar-muted text-xs font-semibold uppercase tracking-wider">
+            {label}
+          </SidebarGroupLabel>
+        )}
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {visible.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild>
+                  <NavLink
+                    to={item.url}
+                    end={item.url === "/"}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                    onClick={handleNavClick}
+                  >
+                    <item.icon className="h-4 w-4 shrink-0" />
+                    {!collapsed && <span>{item.title}</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    );
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">

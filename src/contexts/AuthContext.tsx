@@ -4,7 +4,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: "super_admin" | "admin" | "manager";
+  role: string; // now dynamic — matches role name (snake_case)
   avatar?: string;
 }
 
@@ -12,7 +12,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, role?: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -25,15 +25,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const login = useCallback(async (email: string, _password: string) => {
+  const login = useCallback(async (email: string, _password: string, role?: string) => {
     setIsLoading(true);
-    // Simulated login — replace with real API
     await new Promise((r) => setTimeout(r, 800));
+    const selectedRole = role || "super_admin";
+    const roleName = selectedRole.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
     const mockUser: User = {
       id: "1",
       email,
-      name: "Admin User",
-      role: "super_admin",
+      name: roleName + " User",
+      role: selectedRole,
     };
     localStorage.setItem("magicdose_user", JSON.stringify(mockUser));
     setUser(mockUser);
