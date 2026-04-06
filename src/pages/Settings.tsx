@@ -165,6 +165,11 @@ export default function Settings() {
           </Card>
         </TabsContent>
 
+        {/* Roles & Permissions Tab */}
+        <TabsContent value="roles">
+          <RolesPermissionsTab />
+        </TabsContent>
+
         {/* Notifications Tab */}
         <TabsContent value="notifications">
           <Card>
