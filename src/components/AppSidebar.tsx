@@ -48,6 +48,10 @@ export function AppSidebar() {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
 
+  const handleNavClick = () => {
+    if (isMobile) setOpenMobile(false);
+  };
+
   const renderGroup = (label: string, items: typeof mainNav) => (
     <SidebarGroup>
       {!collapsed && <SidebarGroupLabel className="text-sidebar-muted text-xs font-semibold uppercase tracking-wider">{label}</SidebarGroupLabel>}
@@ -61,6 +65,7 @@ export function AppSidebar() {
                   end={item.url === "/"}
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                  onClick={handleNavClick}
                 >
                   <item.icon className="h-4 w-4 shrink-0" />
                   {!collapsed && <span>{item.title}</span>}
