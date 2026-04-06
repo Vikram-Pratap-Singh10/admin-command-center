@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pill, Eye, EyeOff, Loader2 } from "lucide-react";
+import { loadRoles } from "@/data/roles-permissions";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email address"),
@@ -22,6 +24,8 @@ export default function Login() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [selectedRole, setSelectedRole] = useState("super_admin");
+  const roles = loadRoles();
 
   const {
     register,
@@ -34,7 +38,7 @@ export default function Login() {
   const onSubmit = async (data: LoginForm) => {
     try {
       setError("");
-      await login(data.email, data.password);
+      await login(data.email, data.password, selectedRole);
       navigate("/", { replace: true });
     } catch {
       setError("Invalid credentials. Please try again.");
@@ -100,6 +104,25 @@ export default function Login() {
                 {errors.password && (
                   <p className="text-xs text-destructive">{errors.password.message}</p>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>Login as Role</Label>
+                <Select value={selectedRole} onValueChange={setSelectedRole}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((role) => (
+                      <SelectItem
+                        key={role.id}
+                        value={role.name.toLowerCase().replace(/\s+/g, "_")}
+                      >
+                        {role.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
