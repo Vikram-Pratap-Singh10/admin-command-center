@@ -23,6 +23,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { VerificationModal } from "@/components/users/VerificationModal";
 import { DivisionAssignModal } from "@/components/users/DivisionAssignModal";
+import { DistributorFormModal } from "@/components/users/DistributorFormModal";
+import { MRFormModal } from "@/components/users/MRFormModal";
 import {
   mockDistributors,
   mockMRs,
@@ -200,6 +202,8 @@ export default function Users() {
   // Modals
   const [verifyDist, setVerifyDist] = useState<Distributor | null>(null);
   const [divisionDist, setDivisionDist] = useState<Distributor | null>(null);
+  const [showDistForm, setShowDistForm] = useState(false);
+  const [showMRForm, setShowMRForm] = useState(false);
 
   // MR filter by distributor
   const [selectedDistributor, setSelectedDistributor] = useState<Distributor | null>(null);
