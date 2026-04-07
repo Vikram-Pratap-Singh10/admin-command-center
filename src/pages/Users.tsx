@@ -232,6 +232,33 @@ export default function Users() {
     toast.success("Divisions updated successfully");
   };
 
+  const handleAddDistributor = (data: Omit<Distributor, "id" | "mrCount" | "joinedAt" | "gstDocUrl" | "drugLicenseDocUrl" | "status">) => {
+    const newDist: Distributor = {
+      ...data,
+      id: `dist-${Date.now()}`,
+      mrCount: 0,
+      joinedAt: new Date().toLocaleDateString(),
+      gstDocUrl: "/placeholder.svg",
+      drugLicenseDocUrl: "/placeholder.svg",
+      status: "pending",
+    };
+    setDistributors((prev) => [newDist, ...prev]);
+    toast.success("Distributor added successfully");
+  };
+
+  const handleAddMR = (data: Omit<MedicalRep, "id" | "joinedAt" | "status" | "distributorName">) => {
+    const dist = distributors.find((d) => d.id === data.distributorId);
+    const newMR: MedicalRep = {
+      ...data,
+      id: `mr-${Date.now()}`,
+      distributorName: dist?.name ?? "Unknown",
+      status: "active",
+      joinedAt: new Date().toLocaleDateString(),
+    };
+    setMRs((prev) => [newMR, ...prev]);
+    toast.success("Medical Representative added successfully");
+  };
+
   const handleToggleMR = (mr: MedicalRep) => {
     setMRs((prev) =>
       prev.map((m) =>
@@ -265,7 +292,10 @@ export default function Users() {
           </p>
         </div>
         <PermissionGuard permission="edit_user" fallback="disable">
-          <Button>Add User</Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowMRForm(true)}>Add MR</Button>
+            <Button onClick={() => setShowDistForm(true)}>Add Distributor</Button>
+          </div>
         </PermissionGuard>
       </div>
 
