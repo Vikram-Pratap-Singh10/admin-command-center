@@ -363,6 +363,19 @@ export default function Users() {
         onOpenChange={(open) => !open && setDivisionDist(null)}
         onSave={handleDivisionSave}
       />
+
+      <DistributorFormModal
+        open={showDistForm}
+        onOpenChange={setShowDistForm}
+        onSave={handleAddDistributor}
+      />
+
+      <MRFormModal
+        open={showMRForm}
+        onOpenChange={setShowMRForm}
+        onSave={handleAddMR}
+        distributors={distributors}
+      />
     </div>
   );
 }
