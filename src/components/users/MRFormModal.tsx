@@ -64,7 +64,14 @@ export const MRFormModal: React.FC<MRFormModalProps> = ({
   });
 
   const onSubmit = (data: MRFormValues) => {
-    onSave(data);
+    onSave({
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      distributorId: data.distributorId,
+      territory: data.territory,
+      division: data.division,
+    });
     reset();
     onOpenChange(false);
   };

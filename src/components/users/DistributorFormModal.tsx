@@ -75,7 +75,17 @@ export const DistributorFormModal: React.FC<DistributorFormModalProps> = ({
   };
 
   const onSubmit = (data: DistributorFormValues) => {
-    onSave({ ...data, divisions: selectedDivisions });
+    onSave({
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      company: data.company,
+      gstNumber: data.gstNumber,
+      drugLicenseNumber: data.drugLicenseNumber,
+      city: data.city,
+      state: data.state,
+      divisions: selectedDivisions,
+    });
     reset();
     setSelectedDivisions([]);
     onOpenChange(false);
