@@ -110,7 +110,6 @@ export default function Products() {
             </Button>
           </PermissionGuard>
         </div>
-        </PermissionGuard>
       ),
     },
   ], [selectedProducts]);
