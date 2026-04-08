@@ -13,6 +13,7 @@ export interface Category {
   id: string;
   name: string;
   description: string;
+  imageUrl: string;
   isActive: boolean;
 }
 
@@ -60,6 +61,7 @@ export const mockCategories: Category[] = CATEGORY_NAMES.map((name, i) => ({
   id: `cat-${i + 1}`,
   name,
   description: `${name} dosage form products`,
+  imageUrl: "/placeholder.svg",
   isActive: true,
 }));
 
