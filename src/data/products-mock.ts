@@ -9,10 +9,18 @@ export interface Division {
   isActive: boolean;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+}
+
 export interface Product {
   id: string;
   name: string;
   division: string;
+  category: string;
   description: string;
   images: string[];
   mrp: number;
@@ -43,10 +51,23 @@ const productNames = [
   "Calcibone D3", "Pantocid DSR",
 ];
 
+export const CATEGORY_NAMES = [
+  "Tablet", "Capsule", "Syrup", "Injection", "Cream", "Gel", "Ointment",
+  "Inhaler", "Drops", "Powder", "Lotion", "Suspension",
+];
+
+export const mockCategories: Category[] = CATEGORY_NAMES.map((name, i) => ({
+  id: `cat-${i + 1}`,
+  name,
+  description: `${name} dosage form products`,
+  isActive: true,
+}));
+
 export const mockProducts: Product[] = productNames.map((name, i) => ({
   id: `prod-${i + 1}`,
   name,
   division: DIVISIONS[i % DIVISIONS.length],
+  category: CATEGORY_NAMES[i % CATEGORY_NAMES.length],
   description: `${name} - High quality pharmaceutical product for ${DIVISIONS[i % DIVISIONS.length].toLowerCase()} treatments.`,
   images: ["/placeholder.svg"],
   mrp: Math.round((Math.random() * 800 + 50) * 100) / 100,
