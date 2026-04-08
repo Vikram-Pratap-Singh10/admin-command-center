@@ -299,6 +299,12 @@ export default function Products() {
           toast({ title: `Product ${productModal.product ? "updated" : "created"}` });
         }}
       />
+
+      <ProductDetailModal
+        open={!!detailProduct}
+        product={detailProduct}
+        onClose={() => setDetailProduct(null)}
+      />
     </div>
   );
 }
