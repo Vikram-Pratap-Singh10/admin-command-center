@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Product } from "@/data/products-mock";
+import { Product, CATEGORY_NAMES } from "@/data/products-mock";
 import { DIVISIONS } from "@/data/users-mock";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
@@ -18,6 +18,7 @@ import { Upload, X, ImageIcon } from "lucide-react";
 const schema = z.object({
   name: z.string().min(2).max(100),
   division: z.string().min(1, "Select a division"),
+  category: z.string().min(1, "Select a category"),
   description: z.string().min(5).max(500),
   mrp: z.coerce.number().positive("MRP must be positive"),
   actualPrice: z.coerce.number().positive("Actual price must be positive"),
@@ -31,18 +32,19 @@ type FormValues = z.infer<typeof schema>;
 interface Props {
   open: boolean;
   product?: Product;
+  categories?: string[];
   onClose: () => void;
   onSave: (product: Product) => void;
 }
 
-export function ProductFormModal({ open, product, onClose, onSave }: Props) {
+export function ProductFormModal({ open, product, categories, onClose, onSave }: Props) {
   const [images, setImages] = useState<string[]>(["/placeholder.svg"]);
   const [isDragging, setIsDragging] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: "", division: "", description: "", mrp: 0, actualPrice: 0, sku: "", stock: 0, isActive: true,
+      name: "", division: "", category: "", description: "", mrp: 0, actualPrice: 0, sku: "", stock: 0, isActive: true,
     },
   });
 
@@ -50,13 +52,14 @@ export function ProductFormModal({ open, product, onClose, onSave }: Props) {
     if (open) {
       if (product) {
         form.reset({
-          name: product.name, division: product.division, description: product.description,
+          name: product.name, division: product.division, category: product.category,
+          description: product.description,
           mrp: product.mrp, actualPrice: product.actualPrice, sku: product.sku,
           stock: product.stock, isActive: product.isActive,
         });
         setImages(product.images);
       } else {
-        form.reset({ name: "", division: "", description: "", mrp: 0, actualPrice: 0, sku: "", stock: 0, isActive: true });
+        form.reset({ name: "", division: "", category: "", description: "", mrp: 0, actualPrice: 0, sku: "", stock: 0, isActive: true });
         setImages(["/placeholder.svg"]);
       }
     }
@@ -77,6 +80,7 @@ export function ProductFormModal({ open, product, onClose, onSave }: Props) {
       id: product?.id ?? "",
       name: values.name,
       division: values.division,
+      category: values.category,
       description: values.description,
       mrp: values.mrp,
       actualPrice: values.actualPrice,
