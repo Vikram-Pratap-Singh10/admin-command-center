@@ -11,7 +11,8 @@ import { DIVISIONS } from "@/data/users-mock";
 import { DivisionModal } from "@/components/products/DivisionModal";
 import { ProductFormModal } from "@/components/products/ProductFormModal";
 import { CategoryModal } from "@/components/products/CategoryModal";
-import { Package, Layers, Plus, Trash2, Ban, Tag } from "lucide-react";
+import { ProductDetailModal } from "@/components/products/ProductDetailModal";
+import { Package, Layers, Plus, Trash2, Ban, Tag, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Products() {
@@ -23,6 +24,7 @@ export default function Products() {
   const [divisionModal, setDivisionModal] = useState<{ open: boolean; division?: Division }>({ open: false });
   const [productModal, setProductModal] = useState<{ open: boolean; product?: Product }>({ open: false });
   const [categoryModal, setCategoryModal] = useState<{ open: boolean; category?: Category }>({ open: false });
+  const [detailProduct, setDetailProduct] = useState<Product | null>(null);
 
   const categoryNames = useMemo(() => categories.filter((c) => c.isActive).map((c) => c.name), [categories]);
 
@@ -98,11 +100,16 @@ export default function Products() {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <PermissionGuard permission="edit_product">
-          <Button size="sm" variant="ghost" onClick={() => setProductModal({ open: true, product: row.original })}>
-            Edit
+        <div className="flex items-center gap-1">
+          <Button size="sm" variant="ghost" onClick={() => setDetailProduct(row.original)}>
+            <Eye className="h-3.5 w-3.5" />
           </Button>
-        </PermissionGuard>
+          <PermissionGuard permission="edit_product">
+            <Button size="sm" variant="ghost" onClick={() => setProductModal({ open: true, product: row.original })}>
+              Edit
+            </Button>
+          </PermissionGuard>
+        </div>
       ),
     },
   ], [selectedProducts]);
@@ -291,6 +298,12 @@ export default function Products() {
           setProductModal({ open: false });
           toast({ title: `Product ${productModal.product ? "updated" : "created"}` });
         }}
+      />
+
+      <ProductDetailModal
+        open={!!detailProduct}
+        product={detailProduct}
+        onClose={() => setDetailProduct(null)}
       />
     </div>
   );
