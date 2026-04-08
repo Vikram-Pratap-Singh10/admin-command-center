@@ -6,20 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PermissionGuard } from "@/components/PermissionGuard";
-import { mockProducts, mockDivisions, Product, Division } from "@/data/products-mock";
+import { mockProducts, mockDivisions, mockCategories, Product, Division, Category } from "@/data/products-mock";
 import { DIVISIONS } from "@/data/users-mock";
 import { DivisionModal } from "@/components/products/DivisionModal";
 import { ProductFormModal } from "@/components/products/ProductFormModal";
-import { Package, Layers, Plus, Trash2, Ban } from "lucide-react";
+import { CategoryModal } from "@/components/products/CategoryModal";
+import { Package, Layers, Plus, Trash2, Ban, Tag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Products() {
   const { toast } = useToast();
   const [products, setProducts] = useState(mockProducts);
   const [divisions, setDivisions] = useState(mockDivisions);
+  const [categories, setCategories] = useState(mockCategories);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [divisionModal, setDivisionModal] = useState<{ open: boolean; division?: Division }>({ open: false });
   const [productModal, setProductModal] = useState<{ open: boolean; product?: Product }>({ open: false });
+  const [categoryModal, setCategoryModal] = useState<{ open: boolean; category?: Category }>({ open: false });
+
+  const categoryNames = useMemo(() => categories.filter((c) => c.isActive).map((c) => c.name), [categories]);
 
   const handleBulkAction = (action: "deactivate" | "delete") => {
     if (selectedProducts.length === 0) return;
@@ -52,6 +57,7 @@ export default function Products() {
     { accessorKey: "name", header: "Product Name" },
     { accessorKey: "sku", header: "SKU" },
     { accessorKey: "division", header: "Division" },
+    { accessorKey: "category", header: "Category" },
     {
       accessorKey: "mrp",
       header: "MRP (₹)",
@@ -127,6 +133,31 @@ export default function Products() {
     },
   ], []);
 
+  const categoryColumns: ColumnDef<Category>[] = useMemo(() => [
+    { accessorKey: "name", header: "Category" },
+    { accessorKey: "description", header: "Description" },
+    {
+      accessorKey: "isActive",
+      header: "Status",
+      cell: ({ getValue }) => (
+        <Badge variant={getValue() ? "default" : "outline"}>
+          {getValue() ? "Active" : "Inactive"}
+        </Badge>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <PermissionGuard permission="edit_product">
+          <Button size="sm" variant="ghost" onClick={() => setCategoryModal({ open: true, category: row.original })}>
+            Edit
+          </Button>
+        </PermissionGuard>
+      ),
+    },
+  ], []);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -140,6 +171,7 @@ export default function Products() {
         <TabsList>
           <TabsTrigger value="products" className="gap-1.5"><Package className="h-3.5 w-3.5" /> Products</TabsTrigger>
           <TabsTrigger value="divisions" className="gap-1.5"><Layers className="h-3.5 w-3.5" /> Divisions</TabsTrigger>
+          <TabsTrigger value="categories" className="gap-1.5"><Tag className="h-3.5 w-3.5" /> Categories</TabsTrigger>
         </TabsList>
 
         <TabsContent value="products" className="space-y-4 mt-4">
@@ -169,6 +201,7 @@ export default function Products() {
             columns={productColumns}
             filters={[
               { columnId: "division", label: "Division", options: DIVISIONS.map((d) => ({ label: d, value: d })) },
+              { columnId: "category", label: "Category", options: categoryNames.map((c) => ({ label: c, value: c })) },
               { columnId: "isActive", label: "Status", options: [{ label: "Active", value: "active" }, { label: "Inactive", value: "inactive" }] },
             ]}
             searchPlaceholder="Search products..."
@@ -190,6 +223,23 @@ export default function Products() {
             exportFilename="divisions"
           />
         </TabsContent>
+
+        <TabsContent value="categories" className="space-y-4 mt-4">
+          <PermissionGuard permission="edit_product">
+            <Button size="sm" onClick={() => setCategoryModal({ open: true })}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Category
+            </Button>
+          </PermissionGuard>
+          <DataTable
+            data={categories}
+            columns={categoryColumns}
+            filters={[
+              { columnId: "isActive", label: "Status", options: [{ label: "Active", value: "active" }, { label: "Inactive", value: "inactive" }] },
+            ]}
+            searchPlaceholder="Search categories..."
+            exportFilename="categories"
+          />
+        </TabsContent>
       </Tabs>
 
       <DivisionModal
@@ -207,9 +257,30 @@ export default function Products() {
         }}
       />
 
+      <CategoryModal
+        open={categoryModal.open}
+        category={categoryModal.category}
+        onClose={() => setCategoryModal({ open: false })}
+        onSave={(cat) => {
+          if (categoryModal.category) {
+            setCategories((prev) => prev.map((c) => (c.id === cat.id ? cat : c)));
+          } else {
+            setCategories((prev) => [...prev, { ...cat, id: `cat-${Date.now()}` }]);
+          }
+          setCategoryModal({ open: false });
+          toast({ title: `Category ${categoryModal.category ? "updated" : "created"}` });
+        }}
+        onDelete={(id) => {
+          setCategories((prev) => prev.filter((c) => c.id !== id));
+          setCategoryModal({ open: false });
+          toast({ title: "Category deleted" });
+        }}
+      />
+
       <ProductFormModal
         open={productModal.open}
         product={productModal.product}
+        categories={categoryNames}
         onClose={() => setProductModal({ open: false })}
         onSave={(prod) => {
           if (productModal.product) {
