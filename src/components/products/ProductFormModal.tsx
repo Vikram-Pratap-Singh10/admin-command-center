@@ -136,6 +136,21 @@ export function ProductFormModal({ open, product, categories, onClose, onSave }:
               </FormItem>
             )} />
 
+            <FormField control={form.control} name="category" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {(categories ?? CATEGORY_NAMES).map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )} />
+
             <FormField control={form.control} name="description" render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
