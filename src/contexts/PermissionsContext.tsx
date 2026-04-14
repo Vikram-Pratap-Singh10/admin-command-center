@@ -19,7 +19,10 @@ export type Permission =
   | "view_visual_aids" | "edit_visual_aids"
   | "view_faqs" | "edit_faqs"
   | "send_notifications"
-  | "view_settings" | "edit_settings";
+  | "view_settings" | "edit_settings"
+  | "view_contact_us" | "edit_contact_us" | "delete_contact_us"
+  | "view_privacy_policy" | "edit_privacy_policy" | "delete_privacy_policy"
+  | "view_terms_conditions" | "edit_terms_conditions" | "delete_terms_conditions";
 
 // Map legacy permission strings to module+action pairs
 const LEGACY_MAP: Record<Permission, { module: ModuleKey; action: ActionKey }> = {
@@ -41,6 +44,15 @@ const LEGACY_MAP: Record<Permission, { module: ModuleKey; action: ActionKey }> =
   send_notifications: { module: "notifications", action: "create" },
   view_settings: { module: "settings", action: "view" },
   edit_settings: { module: "settings", action: "update" },
+  view_contact_us: { module: "contact_us", action: "view" },
+  edit_contact_us: { module: "contact_us", action: "update" },
+  delete_contact_us: { module: "contact_us", action: "delete" },
+  view_privacy_policy: { module: "privacy_policy", action: "view" },
+  edit_privacy_policy: { module: "privacy_policy", action: "update" },
+  delete_privacy_policy: { module: "privacy_policy", action: "delete" },
+  view_terms_conditions: { module: "terms_conditions", action: "view" },
+  edit_terms_conditions: { module: "terms_conditions", action: "update" },
+  delete_terms_conditions: { module: "terms_conditions", action: "delete" },
 };
 
 interface PermissionsContextType {

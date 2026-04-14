@@ -8,6 +8,9 @@ import {
   Bell,
   Settings,
   Pill,
+  Phone,
+  Shield,
+  FileText,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -45,6 +48,9 @@ const contentNav: NavItem[] = [
   { title: "Visual Aids", url: "/visual-aids", icon: Image, module: "visual_aids" },
   { title: "FAQs", url: "/faqs", icon: HelpCircle, module: "faqs" },
   { title: "Notifications", url: "/notifications", icon: Bell, module: "notifications" },
+  { title: "Contact Us", url: "/contact-us", icon: Phone, module: "contact_us" },
+  { title: "Privacy Policy", url: "/privacy-policy", icon: Shield, module: "privacy_policy" },
+  { title: "Terms & Conditions", url: "/terms-conditions", icon: FileText, module: "terms_conditions" },
 ];
 
 const systemNav: NavItem[] = [
