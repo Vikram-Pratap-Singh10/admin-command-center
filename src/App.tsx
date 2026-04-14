@@ -17,6 +17,9 @@ import VisualAids from "@/pages/VisualAids";
 import FAQs from "@/pages/FAQs";
 import Notifications from "@/pages/Notifications";
 import Settings from "@/pages/Settings";
+import ContactUs from "@/pages/ContactUs";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsConditions from "@/pages/TermsConditions";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +50,9 @@ const App = () => (
                   <Route path="/faqs" element={<ErrorBoundary><FAQs /></ErrorBoundary>} />
                   <Route path="/notifications" element={<ErrorBoundary><Notifications /></ErrorBoundary>} />
                   <Route path="/settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
+                  <Route path="/contact-us" element={<ErrorBoundary><ContactUs /></ErrorBoundary>} />
+                  <Route path="/privacy-policy" element={<ErrorBoundary><PrivacyPolicy /></ErrorBoundary>} />
+                  <Route path="/terms-conditions" element={<ErrorBoundary><TermsConditions /></ErrorBoundary>} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>

@@ -8,6 +8,9 @@ export const MODULES = [
   { key: "faqs", label: "FAQs", icon: "HelpCircle" },
   { key: "notifications", label: "Notifications", icon: "Bell" },
   { key: "settings", label: "Settings", icon: "Settings" },
+  { key: "contact_us", label: "Contact Us", icon: "Phone" },
+  { key: "privacy_policy", label: "Privacy Policy", icon: "Shield" },
+  { key: "terms_conditions", label: "Terms & Conditions", icon: "FileText" },
 ] as const;
 
 export type ModuleKey = (typeof MODULES)[number]["key"];
@@ -59,6 +62,9 @@ export const DEFAULT_ROLES: Role[] = [
       faqs: allPermissions(true),
       notifications: allPermissions(true),
       settings: allPermissions(true),
+      contact_us: allPermissions(true),
+      privacy_policy: allPermissions(true),
+      terms_conditions: allPermissions(true),
     }),
   },
   {
@@ -76,6 +82,9 @@ export const DEFAULT_ROLES: Role[] = [
       faqs: { view: true, create: true, update: true, delete: false, export: false },
       notifications: { view: true, create: true, update: false, delete: false, export: false },
       settings: { view: true, create: false, update: false, delete: false, export: false },
+      contact_us: { view: true, create: true, update: true, delete: false, export: false },
+      privacy_policy: { view: true, create: true, update: true, delete: false, export: false },
+      terms_conditions: { view: true, create: true, update: true, delete: false, export: false },
     }),
   },
   {
@@ -93,6 +102,9 @@ export const DEFAULT_ROLES: Role[] = [
       faqs: { view: true, create: false, update: false, delete: false, export: false },
       notifications: { view: true, create: false, update: false, delete: false, export: false },
       settings: { view: true, create: false, update: false, delete: false, export: false },
+      contact_us: { view: true, create: false, update: false, delete: false, export: false },
+      privacy_policy: { view: true, create: false, update: false, delete: false, export: false },
+      terms_conditions: { view: true, create: false, update: false, delete: false, export: false },
     }),
   },
 ];
