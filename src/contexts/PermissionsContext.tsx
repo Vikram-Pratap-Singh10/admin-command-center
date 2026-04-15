@@ -22,7 +22,8 @@ export type Permission =
   | "view_settings" | "edit_settings"
   | "view_contact_us" | "edit_contact_us" | "delete_contact_us"
   | "view_privacy_policy" | "edit_privacy_policy" | "delete_privacy_policy"
-  | "view_terms_conditions" | "edit_terms_conditions" | "delete_terms_conditions";
+  | "view_terms_conditions" | "edit_terms_conditions" | "delete_terms_conditions"
+  | "delete_visual_aids";
 
 // Map legacy permission strings to module+action pairs
 const LEGACY_MAP: Record<Permission, { module: ModuleKey; action: ActionKey }> = {
@@ -39,6 +40,7 @@ const LEGACY_MAP: Record<Permission, { module: ModuleKey; action: ActionKey }> =
   export_orders: { module: "orders", action: "export" },
   view_visual_aids: { module: "visual_aids", action: "view" },
   edit_visual_aids: { module: "visual_aids", action: "update" },
+  delete_visual_aids: { module: "visual_aids", action: "delete" },
   view_faqs: { module: "faqs", action: "view" },
   edit_faqs: { module: "faqs", action: "update" },
   send_notifications: { module: "notifications", action: "create" },
