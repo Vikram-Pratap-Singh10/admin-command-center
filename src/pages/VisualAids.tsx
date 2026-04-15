@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PermissionGuard } from "@/components/PermissionGuard";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Plus, FileText, ImageIcon, Download, Eye, Layers, GripVertical } from "lucide-react";
+import { Search, Plus, FileText, ImageIcon, Download, Eye, Layers, GripVertical, Pencil, Trash2 } from "lucide-react";
 import VisualAidFormModal from "@/components/visual-aids/VisualAidFormModal";
 import VisualAidPreviewModal from "@/components/visual-aids/VisualAidPreviewModal";
 
@@ -26,9 +27,9 @@ export default function VisualAids() {
   const [slideDesc, setSlideDesc] = useState("");
   const [selectedAids, setSelectedAids] = useState<string[]>([]);
 
-  // Visual Aid form & preview state
   const [formModal, setFormModal] = useState<{ open: boolean; aid?: VisualAid }>({ open: false });
   const [previewModal, setPreviewModal] = useState<{ open: boolean; aid: VisualAid | null }>({ open: false, aid: null });
+  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; aid: VisualAid | null }>({ open: false, aid: null });
 
   const filteredAids = useMemo(() => aids.filter((a) => {
     const matchSearch = a.title.toLowerCase().includes(search.toLowerCase());
@@ -71,6 +72,13 @@ export default function VisualAids() {
       return [aid, ...prev];
     });
     toast({ title: `Visual aid ${formModal.aid ? "updated" : "uploaded"}` });
+  };
+
+  const handleDeleteAid = () => {
+    if (!deleteConfirm.aid) return;
+    setAids((prev) => prev.filter((a) => a.id !== deleteConfirm.aid!.id));
+    toast({ title: "Visual aid deleted", description: deleteConfirm.aid.title });
+    setDeleteConfirm({ open: false, aid: null });
   };
 
   const handleDownload = (aid: VisualAid) => {
@@ -130,22 +138,22 @@ export default function VisualAids() {
                     <ImageIcon className="h-12 w-12 text-muted-foreground" />
                   )}
                   <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      className="h-8 w-8"
-                      onClick={() => setPreviewModal({ open: true, aid })}
-                    >
+                    <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => setPreviewModal({ open: true, aid })}>
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      className="h-8 w-8"
-                      onClick={() => handleDownload(aid)}
-                    >
+                    <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => handleDownload(aid)}>
                       <Download className="h-4 w-4" />
                     </Button>
+                    <PermissionGuard permission="edit_visual_aids">
+                      <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => setFormModal({ open: true, aid })}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </PermissionGuard>
+                    <PermissionGuard permission="delete_visual_aids">
+                      <Button size="icon" variant="destructive" className="h-8 w-8" onClick={() => setDeleteConfirm({ open: true, aid })}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </PermissionGuard>
                   </div>
                 </div>
                 <CardContent className="p-3">
@@ -236,7 +244,24 @@ export default function VisualAids() {
         </DialogContent>
       </Dialog>
 
-      {/* Visual Aid Form Modal */}
+      {/* Delete Confirmation */}
+      <AlertDialog open={deleteConfirm.open} onOpenChange={(v) => !v && setDeleteConfirm({ open: false, aid: null })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Visual Aid</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{deleteConfirm.aid?.title}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAid} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <VisualAidFormModal
         open={formModal.open}
         onClose={() => setFormModal({ open: false })}
@@ -244,7 +269,6 @@ export default function VisualAids() {
         aid={formModal.aid}
       />
 
-      {/* Visual Aid Preview Modal */}
       <VisualAidPreviewModal
         open={previewModal.open}
         onClose={() => setPreviewModal({ open: false, aid: null })}
