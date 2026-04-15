@@ -12,6 +12,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PermissionGuard } from "@/components/PermissionGuard";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Plus, FileText, ImageIcon, Download, Eye, Layers, GripVertical } from "lucide-react";
+import VisualAidFormModal from "@/components/visual-aids/VisualAidFormModal";
+import VisualAidPreviewModal from "@/components/visual-aids/VisualAidPreviewModal";
 
 export default function VisualAids() {
   const { toast } = useToast();
@@ -23,6 +25,10 @@ export default function VisualAids() {
   const [slideTitle, setSlideTitle] = useState("");
   const [slideDesc, setSlideDesc] = useState("");
   const [selectedAids, setSelectedAids] = useState<string[]>([]);
+
+  // Visual Aid form & preview state
+  const [formModal, setFormModal] = useState<{ open: boolean; aid?: VisualAid }>({ open: false });
+  const [previewModal, setPreviewModal] = useState<{ open: boolean; aid: VisualAid | null }>({ open: false, aid: null });
 
   const filteredAids = useMemo(() => aids.filter((a) => {
     const matchSearch = a.title.toLowerCase().includes(search.toLowerCase());
@@ -58,6 +64,25 @@ export default function VisualAids() {
 
   const toggleAid = (id: string) => setSelectedAids((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
 
+  const handleSaveAid = (aid: VisualAid) => {
+    setAids((prev) => {
+      const exists = prev.find((a) => a.id === aid.id);
+      if (exists) return prev.map((a) => a.id === aid.id ? aid : a);
+      return [aid, ...prev];
+    });
+    toast({ title: `Visual aid ${formModal.aid ? "updated" : "uploaded"}` });
+  };
+
+  const handleDownload = (aid: VisualAid) => {
+    const link = document.createElement("a");
+    link.href = aid.url;
+    link.download = `${aid.title}.${aid.type === "pdf" ? "pdf" : "png"}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast({ title: "Download started", description: aid.title });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -87,7 +112,9 @@ export default function VisualAids() {
               </SelectContent>
             </Select>
             <PermissionGuard permission="edit_visual_aids">
-              <Button size="sm"><Plus className="mr-1.5 h-3.5 w-3.5" /> Upload</Button>
+              <Button size="sm" onClick={() => setFormModal({ open: true })}>
+                <Plus className="mr-1.5 h-3.5 w-3.5" /> Upload
+              </Button>
             </PermissionGuard>
           </div>
 
@@ -95,10 +122,30 @@ export default function VisualAids() {
             {filteredAids.map((aid) => (
               <Card key={aid.id} className="group overflow-hidden hover:shadow-md transition-shadow">
                 <div className="aspect-[4/3] bg-muted flex items-center justify-center relative">
-                  {aid.type === "pdf" ? <FileText className="h-12 w-12 text-muted-foreground" /> : <ImageIcon className="h-12 w-12 text-muted-foreground" />}
+                  {aid.url && aid.url !== "/placeholder.svg" && aid.type === "image" ? (
+                    <img src={aid.url} alt={aid.title} className="h-full w-full object-cover" />
+                  ) : aid.type === "pdf" ? (
+                    <FileText className="h-12 w-12 text-muted-foreground" />
+                  ) : (
+                    <ImageIcon className="h-12 w-12 text-muted-foreground" />
+                  )}
                   <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                    <Button size="icon" variant="secondary" className="h-8 w-8"><Eye className="h-4 w-4" /></Button>
-                    <Button size="icon" variant="secondary" className="h-8 w-8"><Download className="h-4 w-4" /></Button>
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="h-8 w-8"
+                      onClick={() => setPreviewModal({ open: true, aid })}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="h-8 w-8"
+                      onClick={() => handleDownload(aid)}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
                 <CardContent className="p-3">
@@ -188,6 +235,21 @@ export default function VisualAids() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Visual Aid Form Modal */}
+      <VisualAidFormModal
+        open={formModal.open}
+        onClose={() => setFormModal({ open: false })}
+        onSave={handleSaveAid}
+        aid={formModal.aid}
+      />
+
+      {/* Visual Aid Preview Modal */}
+      <VisualAidPreviewModal
+        open={previewModal.open}
+        onClose={() => setPreviewModal({ open: false, aid: null })}
+        aid={previewModal.aid}
+      />
     </div>
   );
 }
