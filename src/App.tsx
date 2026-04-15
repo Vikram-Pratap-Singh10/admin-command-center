@@ -48,6 +48,7 @@ const App = () => (
                   <Route path="/products" element={<ErrorBoundary><Products /></ErrorBoundary>} />
                   <Route path="/orders" element={<ErrorBoundary><Orders /></ErrorBoundary>} />
                   <Route path="/visual-aids" element={<ErrorBoundary><VisualAids /></ErrorBoundary>} />
+                  <Route path="/cart" element={<ErrorBoundary><Cart /></ErrorBoundary>} />
                   <Route path="/faqs" element={<ErrorBoundary><FAQs /></ErrorBoundary>} />
                   <Route path="/notifications" element={<ErrorBoundary><Notifications /></ErrorBoundary>} />
                   <Route path="/settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
