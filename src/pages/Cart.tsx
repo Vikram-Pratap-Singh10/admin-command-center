@@ -199,7 +199,7 @@ export default function Cart() {
 
           {orderPlaced ? (
             <div className="flex flex-col items-center gap-4 py-8">
-              <CheckCircle className="h-16 w-16 text-green-500" />
+              <CheckCircle className="h-16 w-16 text-primary" />
               <div className="text-center">
                 <p className="text-lg font-semibold">Thank you for your order!</p>
                 <p className="text-sm text-muted-foreground mt-1">Order total: ₹{cartTotal.toFixed(2)}</p>

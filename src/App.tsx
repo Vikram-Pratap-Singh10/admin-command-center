@@ -14,6 +14,7 @@ import Users from "@/pages/Users";
 import Products from "@/pages/Products";
 import Orders from "@/pages/Orders";
 import VisualAids from "@/pages/VisualAids";
+import Cart from "@/pages/Cart";
 import FAQs from "@/pages/FAQs";
 import Notifications from "@/pages/Notifications";
 import Settings from "@/pages/Settings";
