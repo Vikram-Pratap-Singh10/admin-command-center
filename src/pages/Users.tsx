@@ -253,6 +253,9 @@ export default function Users() {
   const [divisionDist, setDivisionDist] = useState<Distributor | null>(null);
   const [showDistForm, setShowDistForm] = useState(false);
   const [showMRForm, setShowMRForm] = useState(false);
+  const [verifyMR, setVerifyMR] = useState<MedicalRep | null>(null);
+  const [divisionMR, setDivisionMR] = useState<MedicalRep | null>(null);
+  const [detailMR, setDetailMR] = useState<MedicalRep | null>(null);
 
   // MR filter by distributor
   const [selectedDistributor, setSelectedDistributor] = useState<Distributor | null>(null);
