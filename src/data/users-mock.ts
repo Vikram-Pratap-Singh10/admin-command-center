@@ -68,6 +68,7 @@ export const mockDistributors: Distributor[] = Array.from({ length: 30 }, (_, i)
 
 export const mockMRs: MedicalRep[] = Array.from({ length: 60 }, (_, i) => {
   const distIndex = i % mockDistributors.length;
+  const statusPool = ["approved", "approved", "approved", "pending", "inactive", "rejected", "active"] as const;
   return {
     id: `mr-${i + 1}`,
     name: `MR ${i + 1}`,
@@ -75,9 +76,14 @@ export const mockMRs: MedicalRep[] = Array.from({ length: 60 }, (_, i) => {
     phone: `+91 91234 ${String(56780 + i).slice(0, 5)}`,
     distributorId: mockDistributors[distIndex].id,
     distributorName: mockDistributors[distIndex].name,
-    status: i % 6 === 0 ? "inactive" : "active",
+    status: statusPool[i % statusPool.length],
     territory: cities[i % cities.length],
     division: DIVISIONS[i % DIVISIONS.length],
+    divisions: DIVISIONS.slice(0, (i % 3) + 1),
     joinedAt: new Date(2025, (i + 3) % 12, (i % 28) + 1).toLocaleDateString(),
+    idProofUrl: "/placeholder.svg",
+    addressProofUrl: "/placeholder.svg",
+    city: cities[i % cities.length],
+    state: states[i % states.length],
   };
 });
