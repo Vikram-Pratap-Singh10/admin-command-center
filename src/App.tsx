@@ -33,36 +33,40 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <PermissionsProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route
-                  element={
-                    <ProtectedRoute>
-                      <DashboardLayout />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route path="/" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
-                  <Route path="/users" element={<ErrorBoundary><Users /></ErrorBoundary>} />
-                  <Route path="/products" element={<ErrorBoundary><Products /></ErrorBoundary>} />
-                  <Route path="/orders" element={<ErrorBoundary><Orders /></ErrorBoundary>} />
-                  <Route path="/visual-aids" element={<ErrorBoundary><VisualAids /></ErrorBoundary>} />
-                  <Route path="/cart" element={<ErrorBoundary><Cart /></ErrorBoundary>} />
-                  <Route path="/faqs" element={<ErrorBoundary><FAQs /></ErrorBoundary>} />
-                  <Route path="/notifications" element={<ErrorBoundary><Notifications /></ErrorBoundary>} />
-                  <Route path="/settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
-                  <Route path="/contact-us" element={<ErrorBoundary><ContactUs /></ErrorBoundary>} />
-                  <Route path="/privacy-policy" element={<ErrorBoundary><PrivacyPolicy /></ErrorBoundary>} />
-                  <Route path="/terms-conditions" element={<ErrorBoundary><TermsConditions /></ErrorBoundary>} />
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
+          <CartProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route path="/" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
+                    <Route path="/users" element={<ErrorBoundary><Users /></ErrorBoundary>} />
+                    <Route path="/products" element={<ErrorBoundary><Products /></ErrorBoundary>} />
+                    <Route path="/orders" element={<ErrorBoundary><Orders /></ErrorBoundary>} />
+                    <Route path="/visual-aids" element={<ErrorBoundary><VisualAids /></ErrorBoundary>} />
+                    <Route path="/cart" element={<ErrorBoundary><Cart /></ErrorBoundary>} />
+                    <Route path="/cart-list" element={<ErrorBoundary><CartList /></ErrorBoundary>} />
+                    <Route path="/cart-list/:productId" element={<ErrorBoundary><CartItemDetail /></ErrorBoundary>} />
+                    <Route path="/faqs" element={<ErrorBoundary><FAQs /></ErrorBoundary>} />
+                    <Route path="/notifications" element={<ErrorBoundary><Notifications /></ErrorBoundary>} />
+                    <Route path="/settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
+                    <Route path="/contact-us" element={<ErrorBoundary><ContactUs /></ErrorBoundary>} />
+                    <Route path="/privacy-policy" element={<ErrorBoundary><PrivacyPolicy /></ErrorBoundary>} />
+                    <Route path="/terms-conditions" element={<ErrorBoundary><TermsConditions /></ErrorBoundary>} />
+                  </Route>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </CartProvider>
         </PermissionsProvider>
       </AuthProvider>
     </QueryClientProvider>
