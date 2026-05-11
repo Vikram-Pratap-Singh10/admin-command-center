@@ -23,10 +23,15 @@ export interface MedicalRep {
   phone: string;
   distributorId: string;
   distributorName: string;
-  status: "active" | "inactive";
+  status: "pending" | "approved" | "rejected" | "active" | "inactive";
   territory: string;
   division: string;
+  divisions: string[];
   joinedAt: string;
+  idProofUrl: string;
+  addressProofUrl: string;
+  city: string;
+  state: string;
 }
 
 export const DIVISIONS = [
