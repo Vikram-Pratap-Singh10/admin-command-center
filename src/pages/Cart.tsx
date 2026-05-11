@@ -1,34 +1,28 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { mockProducts, Product } from "@/data/products-mock";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Search, Plus, Minus, ShoppingCart, Trash2, Package, CheckCircle } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+import { Search, Plus, Minus, ShoppingCart, Trash2, Package, Eye, List } from "lucide-react";
 import { DIVISIONS } from "@/data/users-mock";
 import { CATEGORY_NAMES } from "@/data/products-mock";
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
-}
 
 export default function Cart() {
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { add, updateQuantity, remove, getQuantity, count, items } = useCart();
   const isDistributor = user?.role === "admin" || user?.role === "super_admin";
 
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [search, setSearch] = useState("");
   const [divisionFilter, setDivisionFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false);
 
   const filteredProducts = useMemo(() => mockProducts.filter((p) => {
     if (!p.isActive) return false;
@@ -38,41 +32,126 @@ export default function Cart() {
     return matchSearch && matchDiv && matchCat;
   }), [search, divisionFilter, categoryFilter]);
 
-  const getCartQuantity = (productId: string) => cart.find((c) => c.product.id === productId)?.quantity ?? 0;
-
   const addToCart = (product: Product) => {
-    setCart((prev) => {
-      const existing = prev.find((c) => c.product.id === product.id);
-      if (existing) {
-        return prev.map((c) => c.product.id === product.id ? { ...c, quantity: c.quantity + 1 } : c);
-      }
-      return [...prev, { product, quantity: 1 }];
-    });
+    add(product);
     toast({ title: "Added to cart", description: product.name });
   };
 
-  const updateQuantity = (productId: string, delta: number) => {
-    setCart((prev) => {
-      return prev.map((c) => {
-        if (c.product.id !== productId) return c;
-        const newQty = c.quantity + delta;
-        return newQty > 0 ? { ...c, quantity: newQty } : c;
-      }).filter((c) => c.quantity > 0);
-    });
-  };
-
-  const removeFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((c) => c.product.id !== productId));
-  };
-
-  const clearCart = () => setCart([]);
-
-  const cartTotal = useMemo(() => cart.reduce((sum, item) => {
+  const cartTotal = useMemo(() => items.reduce((sum, item) => {
     const price = isDistributor ? item.product.actualPrice : item.product.mrp;
     return sum + price * item.quantity;
-  }, 0), [cart, isDistributor]);
+  }, 0), [items, isDistributor]);
 
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Add to Cart</h2>
+          <p className="text-muted-foreground text-sm">Browse products and add them to your cart list</p>
+        </div>
+        <Button
+          variant={count > 0 ? "default" : "outline"}
+          onClick={() => navigate("/cart-list")}
+          className="gap-2"
+        >
+          <List className="h-4 w-4" />
+          View Cart List ({count})
+          {count > 0 && <span className="ml-1">· ₹{cartTotal.toFixed(2)}</span>}
+        </Button>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+        </div>
+        <Select value={divisionFilter} onValueChange={setDivisionFilter}>
+          <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Divisions</SelectItem>
+            {DIVISIONS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {CATEGORY_NAMES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Product Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {filteredProducts.map((product) => {
+          const qty = getQuantity(product.id);
+          const price = isDistributor ? product.actualPrice : product.mrp;
+          return (
+            <Card key={product.id} className="overflow-hidden hover:shadow-md transition-shadow">
+              <div className="aspect-square bg-muted flex items-center justify-center relative">
+                {product.images[0] && product.images[0] !== "/placeholder.svg" ? (
+                  <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
+                ) : (
+                  <Package className="h-12 w-12 text-muted-foreground" />
+                )}
+                {qty > 0 && (
+                  <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground">{qty} in cart</Badge>
+                )}
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="absolute top-2 left-2 h-7 w-7 opacity-90"
+                  onClick={() => navigate(`/cart-list/${product.id}`)}
+                  title="View details"
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+              <CardContent className="p-3 space-y-2">
+                <p className="text-sm font-medium truncate">{product.name}</p>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[10px]">{product.category}</Badge>
+                  <Badge variant="secondary" className="text-[10px]">{product.division}</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-primary">₹{price.toFixed(2)}</p>
+                    {isDistributor && (
+                      <p className="text-[10px] text-muted-foreground line-through">MRP: ₹{product.mrp.toFixed(2)}</p>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">Stock: {product.stock}</span>
+                </div>
+                {qty === 0 ? (
+                  <Button size="sm" className="w-full" onClick={() => addToCart(product)} disabled={product.stock === 0}>
+                    <Plus className="mr-1 h-3.5 w-3.5" /> Add to Cart
+                  </Button>
+                ) : (
+                  <div className="flex items-center justify-between gap-2">
+                    <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateQuantity(product.id, -1)}>
+                      <Minus className="h-3.5 w-3.5" />
+                    </Button>
+                    <span className="text-sm font-semibold">{qty}</span>
+                    <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateQuantity(product.id, 1)} disabled={qty >= product.stock}>
+                      <Plus className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button size="icon" variant="destructive" className="h-8 w-8" onClick={() => remove(product.id)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+      {filteredProducts.length === 0 && (
+        <div className="text-center py-12 text-muted-foreground">No products found</div>
+      )}
+    </div>
+  );
+}
 
   const handleCheckout = () => {
     setOrderPlaced(true);
