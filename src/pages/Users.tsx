@@ -25,6 +25,9 @@ import { VerificationModal } from "@/components/users/VerificationModal";
 import { DivisionAssignModal } from "@/components/users/DivisionAssignModal";
 import { DistributorFormModal } from "@/components/users/DistributorFormModal";
 import { MRFormModal } from "@/components/users/MRFormModal";
+import { MRVerificationModal } from "@/components/users/MRVerificationModal";
+import { MRDivisionAssignModal } from "@/components/users/MRDivisionAssignModal";
+import { MRDetailModal } from "@/components/users/MRDetailModal";
 import {
   mockDistributors,
   mockMRs,
