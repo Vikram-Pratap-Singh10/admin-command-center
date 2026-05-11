@@ -313,13 +313,31 @@ export default function Users() {
 
   const handleToggleMR = (mr: MedicalRep) => {
     setMRs((prev) =>
-      prev.map((m) =>
-        m.id === mr.id
-          ? { ...m, status: m.status === "active" ? ("inactive" as const) : ("active" as const) }
-          : m
-      )
+      prev.map((m) => {
+        if (m.id !== mr.id) return m;
+        const isActive = m.status === "active" || m.status === "approved";
+        return { ...m, status: isActive ? ("inactive" as const) : ("active" as const) };
+      })
     );
-    toast.success(`MR ${mr.status === "active" ? "deactivated" : "activated"}`);
+    const wasActive = mr.status === "active" || mr.status === "approved";
+    toast.success(`MR ${wasActive ? "deactivated" : "activated"}`);
+  };
+
+  const handleApproveMR = (id: string) => {
+    setMRs((prev) => prev.map((m) => m.id === id ? { ...m, status: "approved" as const } : m));
+    setVerifyMR(null);
+    toast.success("MR approved successfully");
+  };
+
+  const handleRejectMR = (id: string, reason: string) => {
+    setMRs((prev) => prev.map((m) => m.id === id ? { ...m, status: "rejected" as const } : m));
+    setVerifyMR(null);
+    toast.error(`MR rejected: ${reason}`);
+  };
+
+  const handleMRDivisionSave = (id: string, divisions: string[]) => {
+    setMRs((prev) => prev.map((m) => m.id === id ? { ...m, divisions } : m));
+    toast.success("Divisions updated successfully");
   };
 
   const handleViewMRs = (d: Distributor) => {
@@ -332,7 +350,7 @@ export default function Users() {
     : mrs;
 
   const distributorColumns = useDistributorColumns(setVerifyDist, setDivisionDist, handleViewMRs);
-  const mrColumns = useMRColumns(handleToggleMR);
+  const mrColumns = useMRColumns(handleToggleMR, setDetailMR, setVerifyMR, setDivisionMR);
 
   return (
     <div className="space-y-6">
