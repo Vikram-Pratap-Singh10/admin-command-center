@@ -129,45 +129,91 @@ function useDistributorColumns(
 }
 
 // ─── MR columns ───
-const mrStatusVariant: Record<string, "default" | "destructive"> = {
+const mrStatusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+  approved: "default",
   active: "default",
-  inactive: "destructive",
+  pending: "secondary",
+  rejected: "destructive",
+  inactive: "outline",
 };
 
-function useMRColumns(onToggle: (mr: MedicalRep) => void) {
+function useMRColumns(
+  onToggle: (mr: MedicalRep) => void,
+  onView: (mr: MedicalRep) => void,
+  onVerify: (mr: MedicalRep) => void,
+  onAssignDivisions: (mr: MedicalRep) => void,
+) {
   const columns: ColumnDef<MedicalRep, unknown>[] = [
     { accessorKey: "name", header: "Name" },
     { accessorKey: "email", header: "Email" },
     { accessorKey: "distributorName", header: "Distributor" },
     { accessorKey: "division", header: "Division" },
+    {
+      accessorKey: "divisions",
+      header: "Divisions",
+      cell: ({ getValue }) => {
+        const divs = (getValue() as string[]) ?? [];
+        if (!divs.length) return <span className="text-muted-foreground text-xs">None</span>;
+        return (
+          <div className="flex flex-wrap gap-1">
+            {divs.slice(0, 2).map((d) => (
+              <Badge key={d} variant="outline" className="text-xs">{d}</Badge>
+            ))}
+            {divs.length > 2 && <Badge variant="outline" className="text-xs">+{divs.length - 2}</Badge>}
+          </div>
+        );
+      },
+      enableSorting: false,
+    },
     { accessorKey: "territory", header: "Territory" },
     {
       accessorKey: "status",
       header: "Status",
       cell: ({ getValue }) => {
         const s = String(getValue());
-        return <Badge variant={mrStatusVariant[s] ?? "default"} className="capitalize">{s}</Badge>;
+        return <Badge variant={mrStatusVariant[s] ?? "outline"} className="capitalize">{s}</Badge>;
       },
     },
     { accessorKey: "joinedAt", header: "Joined" },
     {
       id: "actions",
       header: "",
-      cell: ({ row }) => (
-        <PermissionGuard permission="activate_mr" fallback="hide">
-          <Button
-            variant={row.original.status === "active" ? "outline" : "default"}
-            size="sm"
-            onClick={() => onToggle(row.original)}
-          >
-            {row.original.status === "active" ? (
-              <><UserX className="mr-1.5 h-3.5 w-3.5" /> Deactivate</>
-            ) : (
-              <><UserCheck className="mr-1.5 h-3.5 w-3.5" /> Activate</>
-            )}
-          </Button>
-        </PermissionGuard>
-      ),
+      cell: ({ row }) => {
+        const mr = row.original;
+        const isActive = mr.status === "active" || mr.status === "approved";
+        return (
+          <PermissionGuard permission="activate_mr" fallback="hide">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onView(mr)}>
+                  <Eye className="mr-2 h-4 w-4" /> View Details
+                </DropdownMenuItem>
+                {mr.status === "pending" && (
+                  <DropdownMenuItem onClick={() => onVerify(mr)}>
+                    <Eye className="mr-2 h-4 w-4" /> Verify Documents
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => onAssignDivisions(mr)}>
+                  <FolderTree className="mr-2 h-4 w-4" /> Assign Divisions
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => onToggle(mr)} className={isActive ? "text-destructive" : ""}>
+                  {isActive ? (
+                    <><UserX className="mr-2 h-4 w-4" /> Deactivate</>
+                  ) : (
+                    <><UserCheck className="mr-2 h-4 w-4" /> Activate</>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </PermissionGuard>
+        );
+      },
     },
   ];
   return columns;
