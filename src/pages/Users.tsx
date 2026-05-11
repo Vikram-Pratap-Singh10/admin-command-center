@@ -449,6 +449,27 @@ export default function Users() {
         onSave={handleAddMR}
         distributors={distributors}
       />
+
+      <MRVerificationModal
+        mr={verifyMR}
+        open={!!verifyMR}
+        onOpenChange={(o) => !o && setVerifyMR(null)}
+        onApprove={handleApproveMR}
+        onReject={handleRejectMR}
+      />
+
+      <MRDivisionAssignModal
+        mr={divisionMR}
+        open={!!divisionMR}
+        onOpenChange={(o) => !o && setDivisionMR(null)}
+        onSave={handleMRDivisionSave}
+      />
+
+      <MRDetailModal
+        mr={detailMR}
+        open={!!detailMR}
+        onOpenChange={(o) => !o && setDetailMR(null)}
+      />
     </div>
   );
 }
