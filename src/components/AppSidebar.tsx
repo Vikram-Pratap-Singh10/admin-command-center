@@ -43,6 +43,7 @@ const mainNav: NavItem[] = [
   { title: "Products", url: "/products", icon: Package, module: "products" },
   { title: "Orders", url: "/orders", icon: ShoppingCart, module: "orders" },
   { title: "Add to Cart", url: "/cart", icon: ShoppingCart, module: "orders" },
+  { title: "Cart List", url: "/cart-list", icon: ShoppingCart, module: "orders" },
 ];
 
 const contentNav: NavItem[] = [
