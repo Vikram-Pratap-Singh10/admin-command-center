@@ -238,7 +238,10 @@ const mrFilters: DataTableFilterConfig[] = [
     columnId: "status",
     label: "Status",
     options: [
+      { label: "Approved", value: "approved" },
       { label: "Active", value: "active" },
+      { label: "Pending", value: "pending" },
+      { label: "Rejected", value: "rejected" },
       { label: "Inactive", value: "inactive" },
     ],
   },
