@@ -25,6 +25,9 @@ import { VerificationModal } from "@/components/users/VerificationModal";
 import { DivisionAssignModal } from "@/components/users/DivisionAssignModal";
 import { DistributorFormModal } from "@/components/users/DistributorFormModal";
 import { MRFormModal } from "@/components/users/MRFormModal";
+import { MRVerificationModal } from "@/components/users/MRVerificationModal";
+import { MRDivisionAssignModal } from "@/components/users/MRDivisionAssignModal";
+import { MRDetailModal } from "@/components/users/MRDetailModal";
 import {
   mockDistributors,
   mockMRs,
@@ -126,45 +129,91 @@ function useDistributorColumns(
 }
 
 // ─── MR columns ───
-const mrStatusVariant: Record<string, "default" | "destructive"> = {
+const mrStatusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+  approved: "default",
   active: "default",
-  inactive: "destructive",
+  pending: "secondary",
+  rejected: "destructive",
+  inactive: "outline",
 };
 
-function useMRColumns(onToggle: (mr: MedicalRep) => void) {
+function useMRColumns(
+  onToggle: (mr: MedicalRep) => void,
+  onView: (mr: MedicalRep) => void,
+  onVerify: (mr: MedicalRep) => void,
+  onAssignDivisions: (mr: MedicalRep) => void,
+) {
   const columns: ColumnDef<MedicalRep, unknown>[] = [
     { accessorKey: "name", header: "Name" },
     { accessorKey: "email", header: "Email" },
     { accessorKey: "distributorName", header: "Distributor" },
     { accessorKey: "division", header: "Division" },
+    {
+      accessorKey: "divisions",
+      header: "Divisions",
+      cell: ({ getValue }) => {
+        const divs = (getValue() as string[]) ?? [];
+        if (!divs.length) return <span className="text-muted-foreground text-xs">None</span>;
+        return (
+          <div className="flex flex-wrap gap-1">
+            {divs.slice(0, 2).map((d) => (
+              <Badge key={d} variant="outline" className="text-xs">{d}</Badge>
+            ))}
+            {divs.length > 2 && <Badge variant="outline" className="text-xs">+{divs.length - 2}</Badge>}
+          </div>
+        );
+      },
+      enableSorting: false,
+    },
     { accessorKey: "territory", header: "Territory" },
     {
       accessorKey: "status",
       header: "Status",
       cell: ({ getValue }) => {
         const s = String(getValue());
-        return <Badge variant={mrStatusVariant[s] ?? "default"} className="capitalize">{s}</Badge>;
+        return <Badge variant={mrStatusVariant[s] ?? "outline"} className="capitalize">{s}</Badge>;
       },
     },
     { accessorKey: "joinedAt", header: "Joined" },
     {
       id: "actions",
       header: "",
-      cell: ({ row }) => (
-        <PermissionGuard permission="activate_mr" fallback="hide">
-          <Button
-            variant={row.original.status === "active" ? "outline" : "default"}
-            size="sm"
-            onClick={() => onToggle(row.original)}
-          >
-            {row.original.status === "active" ? (
-              <><UserX className="mr-1.5 h-3.5 w-3.5" /> Deactivate</>
-            ) : (
-              <><UserCheck className="mr-1.5 h-3.5 w-3.5" /> Activate</>
-            )}
-          </Button>
-        </PermissionGuard>
-      ),
+      cell: ({ row }) => {
+        const mr = row.original;
+        const isActive = mr.status === "active" || mr.status === "approved";
+        return (
+          <PermissionGuard permission="activate_mr" fallback="hide">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onView(mr)}>
+                  <Eye className="mr-2 h-4 w-4" /> View Details
+                </DropdownMenuItem>
+                {mr.status === "pending" && (
+                  <DropdownMenuItem onClick={() => onVerify(mr)}>
+                    <Eye className="mr-2 h-4 w-4" /> Verify Documents
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => onAssignDivisions(mr)}>
+                  <FolderTree className="mr-2 h-4 w-4" /> Assign Divisions
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => onToggle(mr)} className={isActive ? "text-destructive" : ""}>
+                  {isActive ? (
+                    <><UserX className="mr-2 h-4 w-4" /> Deactivate</>
+                  ) : (
+                    <><UserCheck className="mr-2 h-4 w-4" /> Activate</>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </PermissionGuard>
+        );
+      },
     },
   ];
   return columns;
@@ -189,7 +238,10 @@ const mrFilters: DataTableFilterConfig[] = [
     columnId: "status",
     label: "Status",
     options: [
+      { label: "Approved", value: "approved" },
       { label: "Active", value: "active" },
+      { label: "Pending", value: "pending" },
+      { label: "Rejected", value: "rejected" },
       { label: "Inactive", value: "inactive" },
     ],
   },
@@ -204,6 +256,9 @@ export default function Users() {
   const [divisionDist, setDivisionDist] = useState<Distributor | null>(null);
   const [showDistForm, setShowDistForm] = useState(false);
   const [showMRForm, setShowMRForm] = useState(false);
+  const [verifyMR, setVerifyMR] = useState<MedicalRep | null>(null);
+  const [divisionMR, setDivisionMR] = useState<MedicalRep | null>(null);
+  const [detailMR, setDetailMR] = useState<MedicalRep | null>(null);
 
   // MR filter by distributor
   const [selectedDistributor, setSelectedDistributor] = useState<Distributor | null>(null);
@@ -261,13 +316,31 @@ export default function Users() {
 
   const handleToggleMR = (mr: MedicalRep) => {
     setMRs((prev) =>
-      prev.map((m) =>
-        m.id === mr.id
-          ? { ...m, status: m.status === "active" ? ("inactive" as const) : ("active" as const) }
-          : m
-      )
+      prev.map((m) => {
+        if (m.id !== mr.id) return m;
+        const isActive = m.status === "active" || m.status === "approved";
+        return { ...m, status: isActive ? ("inactive" as const) : ("active" as const) };
+      })
     );
-    toast.success(`MR ${mr.status === "active" ? "deactivated" : "activated"}`);
+    const wasActive = mr.status === "active" || mr.status === "approved";
+    toast.success(`MR ${wasActive ? "deactivated" : "activated"}`);
+  };
+
+  const handleApproveMR = (id: string) => {
+    setMRs((prev) => prev.map((m) => m.id === id ? { ...m, status: "approved" as const } : m));
+    setVerifyMR(null);
+    toast.success("MR approved successfully");
+  };
+
+  const handleRejectMR = (id: string, reason: string) => {
+    setMRs((prev) => prev.map((m) => m.id === id ? { ...m, status: "rejected" as const } : m));
+    setVerifyMR(null);
+    toast.error(`MR rejected: ${reason}`);
+  };
+
+  const handleMRDivisionSave = (id: string, divisions: string[]) => {
+    setMRs((prev) => prev.map((m) => m.id === id ? { ...m, divisions } : m));
+    toast.success("Divisions updated successfully");
   };
 
   const handleViewMRs = (d: Distributor) => {
@@ -280,7 +353,7 @@ export default function Users() {
     : mrs;
 
   const distributorColumns = useDistributorColumns(setVerifyDist, setDivisionDist, handleViewMRs);
-  const mrColumns = useMRColumns(handleToggleMR);
+  const mrColumns = useMRColumns(handleToggleMR, setDetailMR, setVerifyMR, setDivisionMR);
 
   return (
     <div className="space-y-6">
@@ -375,6 +448,27 @@ export default function Users() {
         onOpenChange={setShowMRForm}
         onSave={handleAddMR}
         distributors={distributors}
+      />
+
+      <MRVerificationModal
+        mr={verifyMR}
+        open={!!verifyMR}
+        onOpenChange={(o) => !o && setVerifyMR(null)}
+        onApprove={handleApproveMR}
+        onReject={handleRejectMR}
+      />
+
+      <MRDivisionAssignModal
+        mr={divisionMR}
+        open={!!divisionMR}
+        onOpenChange={(o) => !o && setDivisionMR(null)}
+        onSave={handleMRDivisionSave}
+      />
+
+      <MRDetailModal
+        mr={detailMR}
+        open={!!detailMR}
+        onOpenChange={(o) => !o && setDetailMR(null)}
       />
     </div>
   );

@@ -71,6 +71,11 @@ export const MRFormModal: React.FC<MRFormModalProps> = ({
       distributorId: data.distributorId,
       territory: data.territory,
       division: data.division,
+      divisions: [data.division],
+      idProofUrl: "/placeholder.svg",
+      addressProofUrl: "/placeholder.svg",
+      city: data.territory,
+      state: "",
     });
     reset();
     onOpenChange(false);
